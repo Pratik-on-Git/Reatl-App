@@ -93,6 +93,7 @@ function connectDB(){
         console.log("❌ Error connecting to MongoDB", err);
     });
 }
+module.exports = connectDB
 ```
 1. We'll Connect to the MongoDB database through `const mongoose = require('mongoose')`
 2. We'll code how the database will be connected to the server through `function connectDB()`
@@ -100,3 +101,25 @@ function connectDB(){
 4. If the connection is successful, the following messages will be printed to the console or not. (`err` -> Error)
 5. Until the function is getting called it won't connect our database to the server as all the logics are written here.
 6. We'll call the function in `server.js` file.
+```
+const app = require('./src/app');
+const connectDB = require('./src/db/db');
+
+connectDB();
+```
+We'll Connect to the MongoDB database. `connectDB()` <-- This will connect the MongoDB database to the server.
+
+### ✅ Creating Authentication Routes
+We'll create authentication routes in `auth.routes.js` file.
+* We've to create a router for the auth routes. When we want to create an API inside a routes file we've to use express router.
+```
+const express = require('express')
+const router = express.Router()
+
+router.post('/user/register',)
+
+module.exports = router
+```
+* We'll create a function to register a user. The `(req, res)` is the request and response object which we can also call controller.
+* Logic of the function is written in the controller file `auth.controller.js.` in `src/controllers` folder.
+* `router.post` is an API endpoint for the register route. `router.post('/user/register',)`
