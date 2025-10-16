@@ -74,3 +74,29 @@ app.listen(3000, () => {
 ```
 npx nodemon server.js
 ```
+### ✅ Will you Postman API to test
+GET: `http://localhost:3000/` -> Send ➡️
+### ✅ Server Connetion with Database
+Using Community edition of MongoDB
+* Have to install `npm i mongoose`
+* Create `db.js` inside `db` folder in `src` ➡️ `/src/db/db.js`
+```
+const mongoose = require('mongoose')
+
+
+function connectDB(){
+    mongoose.connect("mongodb://localhost:27017/reatl")
+    .then(()=>{
+        console.log('✅ Connected to MongoDB');
+    })
+    .catch((err) => {
+        console.log("❌ Error connecting to MongoDB", err);
+    });
+}
+```
+1. We'll Connect to the MongoDB database through `const mongoose = require('mongoose')`
+2. We'll code how the database will be connected to the server through `function connectDB()`
+3. `mongodb://localhost:27017` (The default port for MongoDB is 27017.) & name of the database - `reatl`
+4. If the connection is successful, the following messages will be printed to the console or not. (`err` -> Error)
+5. Until the function is getting called it won't connect our database to the server as all the logics are written here.
+6. We'll call the function in `server.js` file.
