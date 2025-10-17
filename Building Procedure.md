@@ -486,5 +486,17 @@ async function logoutUser(req, res){
 ```
 `clearCookie` is a method that clears the cookie.
 
-
+Now we'll check the logout API through Postman.
+1. Go to Postman.
+2. Click on `GET` button.
+3. Enter the URL `http://localhost:3000/api/auth/user/logout`.
+4. Click on `Send` button.
+5. The API will return a response with `status code 200`.
+```
+{
+    "message": "User Logged Out Successfully"
+}
+```
+### ✅ Creating APIs for Food Partners
+1. At first we'll create a model for the food partner.
 
