@@ -236,3 +236,76 @@ npm i jsonwebtoken
 npm i cookie-parser
 ```
 We'll use `cookie-parser` to save the token in the cookies. We'll use it as a middleware in `app.js` file.
+```
+app.use(cookieParser());
+app.use(express.json());
+```
+
+Now we'll create a token. jwt.sign() is a method that creates a token in `auth.controller.js` file.
+`id: user._id` is the payload of the token. Object id is the unique identifier of the user.
+```
+const token = jwt.sign({
+    id: user._id
+})
+```
+The token we create is a unique identifier for the user so we've to provide a unique format data to the token. the next parameter is the JWT secret key. We've to generate a random string of characters to use as the JWT secret key.
+
+* Generate a random string of characters to use as the JWT secret key.
+1. Go to [jwtsecrets.com](https://jwtsecrets.com/)
+2. Click on `Generate` button.
+3. Copy the generated string. You can change the string length (bits) as per your requirement. The more the key length is the more secure the token will be but the more time it will take to generate the token (performance of the server will be affected). So we'll try to get a balance between security and performance. (128bits)
+4. Copy the generated string and paste it in the `auth.controller.js` file.
+```
+const token = jwt.sign({
+    id: user._id
+}, "generated_string")
+```
+Now we'll save the token in the cookies with the name of "token".
+```
+res.cookie("token", token)
+```
+So far `auth.controller.js` code
+```
+async function registerUser(req, res) {
+    const { fullName, email, password } = req.body
+    const isUserAlreadyExists = await userModel.findOne({
+        email
+    })
+    if(isUserAlreadyExists){
+        return res.status(400).json({
+            message: "User already exists"
+        })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await userModel.create({
+        fullName,
+        email,
+        password: hashedPassword
+    })
+
+    const token = jwt.sign({
+        id: user._id
+    }, "generated_string")
+    res.cookie("token", token)
+
+    return res.status(201).json({
+        message: "User registered successfully",
+        user:{
+            fullName : user.fullName,
+            email : user.email,
+            _id : user._id
+        }
+    })
+}
+```
+New resource is being created so we're using 201 status code. Through `user` object we'll send the user data to the frontend. We'll never send the password to the frontend. 
+
+As we'll be creating multiple controller functions in `auth.controller.js` file we'll not export each controller function individually. We'll export the controller functions as an object.
+```
+module.exports = { registerUser }
+```
+We'll be requiring the controller functions in `auth.routes.js` file.
+```
+const { registerUser } = require('../controllers/auth.controller');
+```

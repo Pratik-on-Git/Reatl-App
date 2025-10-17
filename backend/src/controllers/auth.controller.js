@@ -27,6 +27,24 @@ async function registerUser(req, res) {
         email,
         password: hashedPassword
     })
+
+// Now we'll create a token. jwt.sign() is a method that creates a token.
+// id: user._id is the payload of the token. Object id is the unique identifier of the user.
+    const token = jwt.sign({
+        id: user._id
+    }, "0e70fbead3c3b9baaa566e98f4ffabb4")
+    // Saving the token in the name of "token" in the cookie.
+    res.cookie("token", token)
+
+    // New resource is being created so we're using 201 status code.
+    return res.status(201).json({
+        message: "User registered successfully",
+        user:{
+            fullName : user.fullName,
+            email : user.email,
+            _id : user._id
+        }
+    })
 }
 
 module.exports = { registerUser }
