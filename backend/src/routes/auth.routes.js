@@ -9,5 +9,6 @@ const router = express.Router();
 // Logic of the function is written in the controller file auth.controller.js.
 
 router.post('/user/register', authController.registerUser);
+router.post('/user/login', authController.loginUser);
 
 module.exports = router;

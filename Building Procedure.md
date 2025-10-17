@@ -309,3 +309,54 @@ We'll be requiring the controller functions in `auth.routes.js` file.
 ```
 const { registerUser } = require('../controllers/auth.controller');
 ```
+
+### ✅ Checking User Registration with Postman 
+
+1. Open Postman.
+2. Click on `POST` button.
+3. Enter the URL `http://localhost:3000/user/register`.
+4. Click on `Body` button.
+5. Click on `raw` button.
+6. Click on `JSON` button.
+7. Enter the JSON data in the body.
+```
+{
+    "fullName": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "password123"
+}
+```
+8. Click on `Send` button.
+9. It will return a response with `status code 404 Not Found`.
+
+The server dosen't know about the route we've created. In both `app.js` & `server.js` file we haven't mentioned the route we've created. 
+* I've to make the server aware about the authentication related API routes. 
+* We've added prefix `/api/user` to the authentication related API routes. 
+* To access the apis of authRoutes we've to use `/api/user` prefix.
+
+Now we'll make the server aware about the authentication related API routes in `app.js` file.
+1. Go to Postman.
+2. Click on `POST` button.
+3. Enter the URL `http://localhost:3000/api/auth/user/register`.
+4. Click on `Body` button.
+5. Click on `raw` button.
+6. Click on `JSON` button.
+7. Enter the JSON data in the body.
+```
+{
+    "fullName": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "password123"
+}
+```
+The API will return a response with `status code 201`.
+```
+{
+    "message": "User registered successfully",
+    "user": {
+        "fullName": "John Doe",
+        "email": "john.doe@example.com",
+        "_id": "68f2457126db591f8df5fd97"
+    }
+}
+```
