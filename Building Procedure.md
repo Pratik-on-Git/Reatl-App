@@ -360,3 +360,53 @@ The API will return a response with `status code 201`.
     }
 }
 ```
+If we try to register the same user again it will return a response with `status code 400`.
+```
+{
+    "message": "User already exists"
+}
+```
+### ✅ Login User API
+```
+async function loginUser(req, res){
+    const { email, password } = req.body;
+
+    const user = await userModel.findOne({
+        email
+    })
+    if(!user){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(!isPasswordValid){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const token = jwt.sign({
+        id: user._id
+    }, "0e70fbead3c3b9baaa566e98f4ffabb4")
+    res.cookie("token", token)
+
+    return res.status(200).json({
+        message: "User Logged In Successfully",
+        user:{
+            fullName : user.fullName,
+            email : user.email,
+            _id : user._id
+        }
+    })
+}
+```
+1. `const { email, password } = req.body;` is used to get the email and password from the request body.
+2. `const user = await userModel.findOne({ email })` is used to find the user in the database.
+3. `if(!user){ return res.status(400).json({ message: "Invalid Email or Password" }) }` is used to check if the user exists in the database.
+4. `const isPasswordValid = await bcrypt.compare(password, user.password)` is used to compare the password with the hashed password.
+5. `if(!isPasswordValid){ return res.status(400).json({ message: "Invalid Email or Password" }) }` is used to check if the password is valid.
+6. `const token = jwt.sign({ id: user._id }, "0e70fbead3c3b9baaa566e98f4ffabb4")` is used to create a token.
+7. `res.cookie("token", token)` is used to save the token in the cookies.
+8. `return res.status(200).json({ message: "User Logged In Successfully", user:{ fullName : user.fullName, email : user.email, _id : user._id } })` is used to return the response to the frontend.
