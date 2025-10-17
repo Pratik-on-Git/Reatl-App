@@ -499,4 +499,170 @@ Now we'll check the logout API through Postman.
 ```
 ### ✅ Creating APIs for Food Partners
 1. At first we'll create a model for the food partner.
+2. Create a `foodpartner.model.js` file in the `models` folder.
+```
+const mongoose = require('mongoose');
 
+const foodPartnerSchema = new mongoose.Schema({
+    fullName: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+    }
+},
+{ 
+    timestamps: true,
+}
+);
+
+const foodPartnerModel = mongoose.model('foodpartner', foodPartnerSchema);
+
+module.exports = foodPartnerModel;
+```
+3. We've to create same type of user controller functions for food partner like we created for user controller functions.
+```
+const foodPartnerModel = require('../models/foodpartner.model')
+async function registerFoodPartner(req, res){
+    const { fullName, email, password } = req.body
+
+    const isAccountAlreadyExists = await foodPartnerModel.findOne({
+        email
+    })
+    if(isAccountAlreadyExists){
+        return res.status(400).json({
+            message: "Food Partner Account Already Exists"
+        })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const foodPartner = await foodPartnerModel.create({
+        fullName,
+        email,
+        password: hashedPassword
+    })
+
+    const token = jwt.sign({
+        id: foodPartner._id
+    }, process.env.JWT_SECRET)
+    res.cookie("token", token)
+
+    return res.status(201).json({
+        message: "Food Partner registered successfully",
+        foodPartner:{
+            fullName : foodPartner.fullName,
+            email : foodPartner.email,
+            _id : foodPartner._id
+        }
+    })
+}
+
+async function loginFoodPartner(req, res){
+    const { email, password } = req.body;
+
+    const foodPartner = await foodPartnerModel.findOne({
+        email
+    })
+    if(!foodPartner){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, foodPartner.password);
+    if(!isPasswordValid){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const token = jwt.sign({
+        id: foodPartner._id
+    }, process.env.JWT_SECRET)
+    res.cookie("token", token)
+
+    return res.status(200).json({
+        message: "Food Partner Logged In Successfully",
+        foodPartner:{
+            fullName : foodPartner.fullName,
+            email : foodPartner.email,
+            _id : foodPartner._id
+        }
+    })
+}
+
+async function logoutFoodPartner(req, res){
+    res.clearCookie("token")
+    return res.status(200).json({
+        message: "Food Partner Logged Out Successfully"
+    })
+}
+```
+4. We've to create same type of user router functions for food partner like we created for user router functions in `auth.routes.js` file.
+```
+router.post('/foodpartner/register', authController.registerFoodPartner);
+router.post('/foodpartner/login', authController.loginFoodPartner);
+router.get('/foodpartner/logout', authController.logoutFoodPartner)
+```
+
+### ✅ Food Model Creation
+1. Create a `food.model.js` file in the `models` folder.
+```
+const mongoose = require('mongoose');
+
+const foodSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    video: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    foodPartnerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'foodpartner',
+        required: true,
+    }
+});
+
+const foodModel = mongoose.model('food', foodSchema);
+
+module.exports = foodModel;
+```
+In Database we'll only store the link of the video.
+* We've created the food routes in `food.routes.js` file.
+```
+const express = require('express')
+const router = express.Router()
+
+module.exports = router
+```
+* We've added the food routes to the `app.js` file.
+```
+app.use('/api/food', foodRoutes)
+```
+* In `food.routes.js` file we've created a POST route for creating a food.
+```
+router.post('/',){
+
+}
+```
+* POST /api/food [protected] -> Normal User can't create a food. Only Food Partner can create a food. We'll create a middleware for this.
+* Create a `auth.middleware.js` file in the `middlewares` folder in `backend/src` folder.
+```
+const foodPartnerModel = require('../models/foodpartner.model');
+const jwt = require('jsonwebtoken');
+
+
+```

@@ -1,5 +1,6 @@
 // We've to create a controller for the auth routes.
 const userModel = require('../models/user.model');
+const foodPartnerModel = require('../models/foodpartner.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -89,4 +90,79 @@ async function logoutUser(req, res){
     })
 }
 
-module.exports = { registerUser, loginUser, logoutUser }
+async function registerFoodPartner(req, res){
+    const { fullName, email, password } = req.body
+
+    const isAccountAlreadyExists = await foodPartnerModel.findOne({
+        email
+    })
+    if(isAccountAlreadyExists){
+        return res.status(400).json({
+            message: "Food Partner Account Already Exists"
+        })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const foodPartner = await foodPartnerModel.create({
+        fullName,
+        email,
+        password: hashedPassword
+    })
+
+    const token = jwt.sign({
+        id: foodPartner._id
+    }, process.env.JWT_SECRET)
+    res.cookie("token", token)
+
+    return res.status(201).json({
+        message: "Food Partner registered successfully",
+        foodPartner:{
+            fullName : foodPartner.fullName,
+            email : foodPartner.email,
+            _id : foodPartner._id
+        }
+    })
+}
+
+async function loginFoodPartner(req, res){
+    const { email, password } = req.body;
+
+    const foodPartner = await foodPartnerModel.findOne({
+        email
+    })
+    if(!foodPartner){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, foodPartner.password);
+    if(!isPasswordValid){
+        return res.status(400).json({
+            message: "Invalid Email or Password"
+        })
+    }
+
+    const token = jwt.sign({
+        id: foodPartner._id
+    }, process.env.JWT_SECRET)
+    res.cookie("token", token)
+
+    return res.status(200).json({
+        message: "Food Partner Logged In Successfully",
+        foodPartner:{
+            fullName : foodPartner.fullName,
+            email : foodPartner.email,
+            _id : foodPartner._id
+        }
+    })
+}
+
+async function logoutFoodPartner(req, res){
+    res.clearCookie("token")
+    return res.status(200).json({
+        message: "Food Partner Logged Out Successfully"
+    })
+}
+
+module.exports = { registerUser, loginUser, logoutUser, registerFoodPartner, loginFoodPartner, logoutFoodPartner }
