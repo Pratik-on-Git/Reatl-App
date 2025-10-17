@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// userSchema is created to store the user data in the database. 
 const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
