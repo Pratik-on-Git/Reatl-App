@@ -32,7 +32,7 @@ async function registerUser(req, res) {
 // id: user._id is the payload of the token. Object id is the unique identifier of the user.
     const token = jwt.sign({
         id: user._id
-    }, "0e70fbead3c3b9baaa566e98f4ffabb4")
+    }, process.env.JWT_SECRET)
     // Saving the token in the name of "token" in the cookie.
     res.cookie("token", token)
 
@@ -68,7 +68,7 @@ async function loginUser(req, res){
 
     const token = jwt.sign({
         id: user._id
-    }, "0e70fbead3c3b9baaa566e98f4ffabb4")
+    }, process.env.JWT_SECRET)
     res.cookie("token", token)
 
     return res.status(200).json({
@@ -81,4 +81,12 @@ async function loginUser(req, res){
     })
 }
 
-module.exports = { registerUser, loginUser }
+async function logoutUser(req, res){
+    // clearCookie is a method that clears the cookie.
+    res.clearCookie("token")
+    return res.status(200).json({
+        message: "User Logged Out Successfully"
+    })
+}
+
+module.exports = { registerUser, loginUser, logoutUser }

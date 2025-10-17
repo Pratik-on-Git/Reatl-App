@@ -1,5 +1,6 @@
 // We'll Start a simple Express.js server.
 // Importing the app from the app.js file.
+require('dotenv').config();
 const app = require('./src/app');
 // We'll Connect to the MongoDB database.
 const connectDB = require('./src/db/db');

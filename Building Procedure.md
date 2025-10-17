@@ -410,3 +410,81 @@ async function loginUser(req, res){
 6. `const token = jwt.sign({ id: user._id }, "0e70fbead3c3b9baaa566e98f4ffabb4")` is used to create a token.
 7. `res.cookie("token", token)` is used to save the token in the cookies.
 8. `return res.status(200).json({ message: "User Logged In Successfully", user:{ fullName : user.fullName, email : user.email, _id : user._id } })` is used to return the response to the frontend.
+
+Now let's check the login API through Postman.
+1. Go to Postman.
+2. Click on `POST` button.
+3. Enter the URL `http://localhost:3000/api/auth/user/login`.
+4. Click on `Body` button.
+5. Click on `raw` button.
+6. Click on `JSON` button.
+7. Enter the JSON data in the body.
+```
+{
+    "email": "john.doe@example.com",
+    "password": "password123"
+}
+```
+The API will return a response with `status code 200`.
+```
+{
+    "message": "User Logged In Successfully",
+    "user": {
+        "fullName": "John Doe",
+        "email": "john.doe@example.com",
+        "_id": "68f2457126db591f8df5fd97"
+    }
+}
+```
+### ✅ Environment Variables JWT Secret Key
+I can see that here my JWT Secret Key is visible to the client. This is not a good practice. We'll use environment variables to store the JWT Secret Key.
+
+1. Create a `.env` file in the root directory of the project.
+2. Add the JWT Secret Key to the `.env` file.
+```
+JWT_SECRET=0e70fbead3c3b9baaa566e98f4ffabb4
+```
+3. Add the `.env` file to the `.gitignore` file.
+```
+.env
+node_modules
+```
+4. Update the `auth.controller.js` file to use the environment variable.
+```
+const token = jwt.sign({
+    id: user._id
+}, process.env.JWT_SECRET)
+```
+5. To use the environment variable we'll use `dotenv` package.
+```
+npm install dotenv
+```
+6. We'll be adding the `dotenv` package to the `server.js` file. Without this the server will not be able to access the environment variables so the JWT Secret Key will not be accessible. 
+
+The value of the JWT Secret Key will be undefined.
+```
+require('dotenv').config();
+```
+7. Update the `db.js` file to use the environment variable.
+```
+mongoose.connect(process.env.MONGO_URL)
+```
+8. Add the environment variables to the `.env` file.
+```
+JWT_SECRET=0e70fbead3c3b9baaa566e98f4ffabb4
+MONGO_URL=mongodb://localhost:27017/reatl
+```
+### ✅ Logout User API 
+1. Update the `auth.controller.js` file to use the environment variable.
+```
+async function logoutUser(req, res){
+    res.clearCookie("token")
+    return res.status(200).json({
+        message: "User Logged Out Successfully"
+    })
+}
+```
+`clearCookie` is a method that clears the cookie.
+
+
+
