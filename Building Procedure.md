@@ -658,11 +658,52 @@ router.post('/',){
 
 }
 ```
-* POST /api/food [protected] -> Normal User can't create a food. Only Food Partner can create a food. We'll create a middleware for this.
+* If I need to call this API I need to call it with prefix `/api/food`.
+* In Postman `POST /api/food` [protected] -> Normal User can't create a food. Only Food Partner can create a food. We'll create a middleware for this.
 * Create a `auth.middleware.js` file in the `middlewares` folder in `backend/src` folder.
 ```
 const foodPartnerModel = require('../models/foodpartner.model');
 const jwt = require('jsonwebtoken');
+```
+* When a Food Partner logs in or registers, we create a token and save it in the cookie. Cookies have a property that whatever we store in the cookie will be sent to the server with every request. 
+* We've created a middleware for this to check if the token is valid. `app.use(cookieParser())` in `app.js` file.
 
+### ✅ Food Partner Middleware
+1. We created a `auth.middleware.js` file in the `middlewares` folder in `backend/src` folder. Now we'll write a function to check if the token is valid.
+```
+const foodPartnerModel = require('../models/foodpartner.model');
+const jwt = require('jsonwebtoken');
 
+async function authFoodPartnerMiddleware(req, res, next){
+    const token = req.cookies.token;
+    if(!token){
+        return res.status(401).json({
+            message: "Unauthorized"
+        })
+    }
+}
+```
+2. In middleware we've three parameters `req, res, next`.
+3. We're getting the token from the cookie. `jwt.verify()` is used to verify the token.
+
+If the token is valid then we'll find the food partner in the database. We saved `foodPartner._id` in the token in auth.controller.js file.
+
+If the token is valid then it'll be in `decoded.id` as an object. If the token is valid then we'll find the food partner based on the decoded.id.
+
+We're creating a new property in req object to store the food partner. We're setting the value of the property to the foodPartner. `next()` is used to move to the next middleware.
+```
+try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const foodPartner = await foodPartnerModel.findById(decoded.id);
+        
+        req.foodPartner = foodPartner;
+        next();
+
+    }
+    catch(err){
+        return res.status(401).json({
+            message: "Unauthorized Access"
+        })
+    }
 ```
