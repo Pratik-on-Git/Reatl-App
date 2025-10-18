@@ -690,8 +690,20 @@ If the token is valid then we'll find the food partner in the database. We saved
 
 If the token is valid then it'll be in `decoded.id` as an object. If the token is valid then we'll find the food partner based on the decoded.id.
 
-We're creating a new property in req object to store the food partner. We're setting the value of the property to the foodPartner. `next()` is used to move to the next middleware.
+We're creating a new property in req object to store the food partner. We're setting the value of the property to the foodPartner. `next()` is used to move to the next middleware. Whatever logic I write after this middleware will be executed.
 ```
+const foodPartnerModel = require('../models/foodpartner.model');
+const jwt = require('jsonwebtoken');
+
+async function authFoodPartnerMiddleware(req, res, next){
+    const token = req.cookies.token;
+    if(!token){
+        return res.status(401).json({
+            message: "Unauthorized"
+        })
+    }
+}
+
 try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -706,4 +718,23 @@ try{
             message: "Unauthorized Access"
         })
     }
+```
+### ✅ Food Controller 
+1. We've created a `food.controller.js` file in the `controllers` folder in `backend/src` folder.
+```
+const foodModel = require('../models/food.model');
+async function createFood(req, res){
+    
+}
+
+module.exports = { createFood }
+```
+* First Controller will help us to upload videos of the food items. Will add a description to the food item. 
+* Will add a name of the food item. After uploading all these things we'll create a food item in the database.
+
+Now let's go to `food.routes.js` file & create a POST route for creating a food. It will authenticate the food partner if the request is valid.
+
+We're using `authMiddleware.authFoodPartnerMiddleware` to authenticate the food partner.
+```
+router.post('/', authMiddleware.authFoodPartnerMiddleware, foodController.createFood)
 ```

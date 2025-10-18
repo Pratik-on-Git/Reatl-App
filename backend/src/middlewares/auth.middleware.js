@@ -21,7 +21,7 @@ async function authFoodPartnerMiddleware(req, res, next){
         // we're creating a new property in req object to store the food partner. 
         // We're setting the value of the property to the foodPartner.
         req.foodPartner = foodPartner;
-        // next() is used to move to the next middleware.
+        // next() is used to move to the next middleware. Whatever logic I write after this middleware will be executed.
         next();
 
     }
@@ -31,3 +31,5 @@ async function authFoodPartnerMiddleware(req, res, next){
         })
     }
 }
+
+module.exports = { authFoodPartnerMiddleware }

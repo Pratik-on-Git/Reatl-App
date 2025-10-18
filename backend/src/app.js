@@ -1,5 +1,6 @@
 // We'll Create a simple Express.js server.
 const express = require('express');
+// We'll use the cookie-parser middleware to parse the cookie.
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth.routes');
 const foodRoutes = require('./routes/food.routes');
