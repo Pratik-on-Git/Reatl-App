@@ -771,11 +771,75 @@ If i remove the middleware then i won't get the access of `foodPartner` in the `
 * We'll be sending three details to req.body from the frontend. In Postman in form-data we'll send the name, video, description. raw format will not be used to send the name, video, description as video will not be sent in raw format.
 ```
 {
-    name: "Burger",
+    name: "Test Meal",
     video: "https://www.youtube.com/watch?v=1234567890",
-    description: "This is a burger"
+    description: "This is a test meal"
 }
 ```
 Now we'll add a console.log(req.body) to see the data in the console in `food.controller.js` file.
 
-🌟But unfortunately we'll see that we'll be getting undefined in the console.
+🌟But unfortunately we'll see that we'll be getting `undefined` in the console.
+
+### ✅ Why multer is required?
+✅ I'm sending data from frontend to backend - name, description in text format. video in url/file format. Express server by default can't read the frontend file format.
+
+✅ We'll use multer to read the frontend file format. It's a middleware package.
+```
+npm i multer
+```
+require in `food.routes.js` file.
+```
+const express = require('express')
+const foodController = require('../controllers/food.controller')
+const router = express.Router()
+const authMiddleware = require('../middlewares/auth.middleware')
+const multer = require('multer')
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+})
+
+router.post('/', authMiddleware.authFoodPartnerMiddleware, upload.single('video'), foodController.createFood)
+
+module.exports = router
+```
+The problem with Express server is that it can't read the frontend file format. Whatever file name we give to the file in the frontend, it will be stored in the backend with the same name. 
+
+Thus `upload.single('video')` is used to read the frontend file format as the key in Postman for the video is `video`. 
+```
+video: "https://www.youtube.com/watch?v=1234567890",
+```
+
+Now we'll restart the server & send the POST request for creating a food. http://localhost:3000/api/food   [protected]
+
+Now we'll see that we'll be getting the message "Food Item Created".
+
+In console we'll see that we'll be getting the data.
+```
+{
+    [Object: null prototype] {
+  name: 'Test Meal',
+  description: 'Test Description'
+}
+}
+```
+The video is also coming in the console but we can't access it as it's in buffer format. Instead we can access it in `req.file`.
+
+This time we'll see that we'll be getting the console -
+```
+[Object: null prototype] {
+  name: 'Test Meal',
+  description: 'Test Description'
+}
+{
+  fieldname: 'video',
+  originalname: '14000992_1080_1920_30fps.mp4',
+  encoding: '7bit',
+  mimetype: 'video/mp4',
+  buffer: <Buffer 00 00 00 1c 66 74 79 70 69 73 6f 35 00 00 02 00 69 73 6f 35 69 73 6f 36 6d 70 34 31 00 00 03 2a 6d 6f 6f 76 00 00 00 6c 6d 76 68 64 00 00 00 00 00 00 ... 2462675 more bytes>,
+  size: 2462725
+}
+```
+
+* We've uploaded the video to the server & stored it in the buffer. Now we've to upload from server to some cloud storage service. 
+* We don't want to store the video in the server as it will take up a lot of space.
