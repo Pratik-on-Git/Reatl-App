@@ -4,7 +4,11 @@ const foodModel = require('../models/food.model');
 // Will add a description to the food item. Will add a name of the food item.
 // after uploading all these things we'll create a food item in the database.
 async function createFood(req, res){
-    
+    console.log(req.foodPartner)
+
+    console.log(req.body)
+
+    res.send("Food Item Created")
 }
 
 module.exports = { createFood }

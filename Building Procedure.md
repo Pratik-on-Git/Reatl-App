@@ -724,7 +724,10 @@ try{
 ```
 const foodModel = require('../models/food.model');
 async function createFood(req, res){
-    
+
+    console.log(req.foodPartner)
+
+    res.send("Food Item Created")
 }
 
 module.exports = { createFood }
@@ -738,3 +741,41 @@ We're using `authMiddleware.authFoodPartnerMiddleware` to authenticate the food 
 ```
 router.post('/', authMiddleware.authFoodPartnerMiddleware, foodController.createFood)
 ```
+* I'll get the access of `foodPartner` from the middleware `authFoodPartnerMiddleware` in the `createFood` controller as `req.foodPartner`. The middleware is providing the value of `foodPartner` to the `createFood` controller.
+
+If i remove the middleware then i won't get the access of `foodPartner` in the `createFood` controller & request will not be authenticated. Food partner's value will be undefined. 
+
+* From Frontend Food item's video, name, description will be uploaded to the server & then it will be stored in the database.
+
+* Now Let's go to pexels.com & take some vertical food videos.
+* Let's go to Postman & create a POST request for creating a food. http://localhost:3000/api/food   [protected]
+* We'll see that we'll be getting the message "Unauthorized Access" for the first time as no token is present in the cookie.
+* We'll go to the Food Partner Login API & login with the food partner's credentials.
+* We'll see that we'll be getting the message "Food Partner Logged In Successfully".
+* We'll go to the Food Partner Dashboard & see that the food partner's token is present in the cookie.
+* Now we'll run the POST request for creating a food. http://localhost:3000/api/food   [protected]
+* We'll see that we'll be getting the message "Food Item Created".
+* request.foodPartner will have the food partner's data
+```
+{
+  _id: new ObjectId('68f27901edbbfdbda76e4196'),
+  fullName: 'Pratik Das',
+  email: 'pratikdas@example.com',
+  password: '$2b$10$3KtwQbGktRf/NWVw6nV0uecncFhIDtj1JHPBiZGrfgSqN51gMehoO',
+  createdAt: 2025-10-17T17:12:33.066Z,
+  updatedAt: 2025-10-17T17:12:33.066Z,
+  __v: 0
+}
+```
+* Password is in hashed form in the database.
+* We'll be sending three details to req.body from the frontend. In Postman in form-data we'll send the name, video, description. raw format will not be used to send the name, video, description as video will not be sent in raw format.
+```
+{
+    name: "Burger",
+    video: "https://www.youtube.com/watch?v=1234567890",
+    description: "This is a burger"
+}
+```
+Now we'll add a console.log(req.body) to see the data in the console in `food.controller.js` file.
+
+🌟But unfortunately we'll see that we'll be getting undefined in the console.
