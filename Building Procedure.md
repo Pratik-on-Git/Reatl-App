@@ -884,3 +884,45 @@ const imagekit = new ImageKit({
 
 module.exports = imagekit;
 ```
+We keep all the 3rd Party services in the `services` folder.
+
+### ✅ Upload File to Imagekit
+* We'll use `imagekit.uploadFile` to upload the file to Imagekit using promise.
+```
+const ImageKit = require('imagekit');
+
+const imagekit = new ImageKit({
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY
+});
+
+async function uploadFile(file, fileName){
+    const result = await imagekit.upload({
+        file: file, 
+        fileName: fileName,
+    })
+}
+
+return result;
+```
+* `buffer` is used to upload the file to Imagekit.
+* `fileName` is used to name the file in Imagekit.
+
+Now we'll use this function in the `food.controller.js` file.
+```
+const storageService = require('../services/storage.service');
+
+async function createFood(req, res){
+    console.log(req.foodPartner)
+    console.log(req.body)
+    console.log(req.file)
+
+    const fileUploadResult = await storageService.uploadFile(req.file.buffer, "<unique_name>")    
+
+    res.send("Food Item Created")
+}
+```
+Here we're basically requring the whole `storage.service.js` file & I'll be getting the `uploadFile` function from it in `storageService`.
+
+ 
