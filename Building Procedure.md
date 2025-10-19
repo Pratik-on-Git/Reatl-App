@@ -842,4 +842,45 @@ This time we'll see that we'll be getting the console -
 ```
 
 * We've uploaded the video to the server & stored it in the buffer. Now we've to upload from server to some cloud storage service. 
+
+### ✅ Cloud Storage Service
 * We don't want to store the video in the server as it will take up a lot of space.
+* Right now we're using our local storage to store the video but in production (after deploying the server) we'll use some cloud storage service to store the video as we'll not be able to store the video in the local storage (Hard Drive/SSD).
+
+Cloud Storage Service is a service that stores the video in the cloud for you & you can access it from anywhere when you want to.
+
+1. We'll use `ImageKit` to store the video.
+2. Against a file that we upload to ImageKit, ImageKit will generate a unique URL for that file. We'll get that in developer options in sidebar of ImageKit.
+3. We'll be needing three things for that - URL EndPoint, Private Key & Public Key.
+4. In `.env` file we'll store these three things.
+```
+JWT_SECRET=<key>
+MONGO_URL=mongodb://localhost:27017/<database_name>
+IMAGEKIT_PUBLIC_KEY=<key>
+IMAGEKIT_PRIVATE_KEY=<key>
+IMAGEKIT_URL_ENDPOINT=<key>
+```
+### ✅ Imagekit Documentation & Upload File to Imagekit
+Now let's search Imagekit Documentation & find out how to upload a file to Imagekit.
+
+Imagekit Documentation - https://docs.imagekit.io/
+* We'll read three section of the documentation - Installation, Initialize SDK, Upload File.
+Installation - 
+```
+npm install imagekit
+```
+Initialize SDK - 
+
+We'll create a `storage.services.js` file in the `services` folder in `backend/src` folder.
+
+```
+const ImageKit = require('imagekit');
+
+const imagekit = new ImageKit({
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY
+});
+
+module.exports = imagekit;
+```
