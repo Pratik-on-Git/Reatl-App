@@ -807,7 +807,7 @@ The problem with Express server is that it can't read the frontend file format. 
 
 Thus `upload.single('video')` is used to read the frontend file format as the key in Postman for the video is `video`. 
 ```
-video: "https://www.youtube.com/watch?v=1234567890",
+video: "https://www.youtube.com/watch?v=1234567890"
 ```
 
 Now we'll restart the server & send the POST request for creating a food. http://localhost:3000/api/food   [protected]
@@ -874,7 +874,7 @@ Initialize SDK -
 We'll create a `storage.services.js` file in the `services` folder in `backend/src` folder.
 
 ```
-const ImageKit = require('imagekit');
+const ImageKit = require('imagekit')
 
 const imagekit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
@@ -889,7 +889,7 @@ We keep all the 3rd Party services in the `services` folder.
 ### ✅ Upload File to Imagekit
 * We'll use `imagekit.uploadFile` to upload the file to Imagekit using promise.
 ```
-const ImageKit = require('imagekit');
+const ImageKit = require('imagekit')
 
 const imagekit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
@@ -904,7 +904,7 @@ async function uploadFile(file, fileName){
     })
 }
 
-return result;
+return result
 ```
 * `buffer` is used to upload the file to Imagekit.
 * `fileName` is used to name the file in Imagekit.
@@ -925,4 +925,3 @@ async function createFood(req, res){
 ```
 Here we're basically requring the whole `storage.service.js` file & I'll be getting the `uploadFile` function from it in `storageService`.
 
- 
